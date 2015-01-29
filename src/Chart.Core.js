@@ -87,6 +87,9 @@
 			// Boolean - Whether to show labels on the scale
 			scaleShowLabels: true,
 
+			// Boolean or a positive integer denoting number of labels to be shown on x axis
+			showXLabels: true,
+
 			// Interpolated JS string - can access value
 			scaleLabel: "<%=value%>",
 
@@ -1761,6 +1764,9 @@
 
 				},this);
 
+				// if showXLabels is a number then divide and determine how many xLabels to skip before showing next label
+				// else, if showXLabels is true, print all labels, else never print
+				this.xLabelsSkipper = isNumber(this.showXLabels) ? Math.ceil(this.xLabels.length/this.showXLabels) : (this.showXLabels === true) ? 1 : this.xLabels.length+1;
 				each(this.xLabels,function(label,index){
 					var xPos = this.calculateX(index) + aliasPixel(this.lineWidth),
 						// Check to see if line/bar here and decide where to place the line
@@ -1812,7 +1818,9 @@
 					ctx.font = this.font;
 					ctx.textAlign = (isRotated) ? "right" : "center";
 					ctx.textBaseline = (isRotated) ? "middle" : "top";
-					ctx.fillText(label, 0, 0);
+					if(index % this.xLabelsSkipper === 0) {
+						ctx.fillText(label, 0, 0);
+					}
 					ctx.restore();
 				},this);
 
